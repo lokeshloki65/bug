@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DEBUGGER_CONSOLE | Debug Master</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <!-- Styles -->
+    <link rel="stylesheet" href="../css/variables.css">
+    <link rel="stylesheet" href="../css/animations.css">
+    <!-- Monaco Editor -->
+    <link rel="stylesheet" data-name="vs/editor/editor.main" href="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs/editor/editor.main.min.css">
+    <style>
+        body {
+            height: 100vh;
+            overflow: hidden;
+            background: #000;
+            display: flex;
+            flex-direction: column;
+            font-family: 'Share Tech Mono', monospace;
+        }
+
+        /* Header */
+        header {
+            height: 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 var(--spacing-lg);
+            border-bottom: 2px solid var(--primary);
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 100;
+        }
+
+        .test-info {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .timer-display { font-size: 1.2rem; font-weight: 700; color: var(--primary); letter-spacing: 2px; }
+
+        .progress-bar-container {
+            width: 250px;
+            height: 4px;
+            background: rgba(0, 242, 255, 0.1);
+            border: 1px solid var(--glass-border);
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: var(--primary);
+            width: 0%;
+            box-shadow: 0 0 10px var(--primary);
+        }
+
+        /* Main Workspace */
+        .workspace {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            overflow: hidden;
+        }
+
+        /* Question Sidebar */
+        .question-panel {
+            padding: var(--spacing-lg);
+            border-right: 1px solid var(--primary);
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-md);
+            background: rgba(0, 242, 255, 0.02);
+        }
+
+        .question-num {
+            font-size: 0.8rem;
+            color: var(--primary);
+            text-transform: uppercase;
+            border-bottom: 1px solid var(--primary);
+            padding-bottom: 5px;
+        }
+
+        .question-title { font-size: 1.3rem; color: var(--text-main); text-transform: uppercase; }
+        .question-desc { color: var(--text-muted); line-height: 1.5; font-size: 0.9rem; }
+
+        /* Editor Area */
+        .editor-container {
+            display: grid;
+            grid-template-rows: 1fr 200px;
+            position: relative;
+        }
+
+        #monaco-editor { width: 100%; height: 100%; border-bottom: 1px solid var(--primary); }
+
+        /* Console Area */
+        .console-panel {
+            background: #000;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .console-header {
+            padding: 0.4rem 1rem;
+            background: var(--primary);
+            color: black;
+            font-size: 0.75rem;
+            font-weight: 900;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .console-output {
+            flex: 1;
+            padding: 1rem;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.85rem;
+            color: var(--accent);
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+
+        .footer-nav {
+            height: 50px;
+            padding: 0 var(--spacing-lg);
+            border-top: 1px solid var(--primary);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #000;
+        }
+
+        .btn-nav {
+            padding: 0.6rem 2rem;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            background: rgba(0, 242, 255, 0.1);
+            font-family: 'Orbitron', monospace;
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn-prev {
+            border-color: #ffcc00;
+            color: #ffcc00;
+            background: rgba(255, 204, 0, 0.05);
+        }
+        
+        .btn-prev:hover:not(:disabled) {
+            border-color: #fff;
+            color: #000;
+            background: #ffcc00;
+            box-shadow: 0 0 20px rgba(255, 204, 0, 0.4);
+        }
+
+        .btn-next {
+            border-color: var(--secondary);
+            color: var(--secondary);
+            background: rgba(188, 19, 254, 0.05);
+        }
+
+        .btn-next:hover:not(:disabled) {
+            background: var(--secondary);
+            color: #fff;
+            box-shadow: 0 0 25px var(--secondary-glow);
+        }
+
+        .btn-nav:disabled {
+            opacity: 0.2;
+            cursor: not-allowed;
+            border-color: var(--glass-border);
+            color: var(--text-muted);
+            background: transparent;
+            box-shadow: none;
+        }
+
+        .btn-submit {
+            background: var(--primary);
+            color: black;
+            font-weight: 900;
+            border: none;
+            padding: 0.5rem 1.5rem;
+        }
+
+        /* Lockdown Overlay */
+        #lockdown-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255,0,0,0.2);
+            backdrop-filter: blur(10px);
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            text-align: center;
+            color: white;
+        }
+
+        #lockdown-overlay h2 { color: #ff0055; font-size: 3rem; text-shadow: 0 0 20px red; }
+        .fullscreen-prompt {
+            padding: 1rem 2rem;
+            background: white;
+            color: black;
+            margin-top: 2rem;
+            border: none;
+            font-family: 'Share Tech Mono', monospace;
+            font-weight: 900;
+        }
+    </style>
+</head>
+<body class="scanline-container" oncontextmenu="return false;">
+
+    <div id="lockdown-overlay">
+        <h2>PROTOCOL_BREACH</h2>
+        <p>SECURE_ENVIRONMENT_TERMINATED</p>
+        <button class="fullscreen-prompt cyber-glitch" id="restore-fullscreen">RE_INITIALIZE_NODE</button>
+    </div>
+
+    <header>
+        <div class="test-info">
+            <h2 id="current-username" style="color: var(--primary); font-size: 1rem;">OPERATOR.LOADING</h2>
+            <div class="timer-container" style="border: 1px solid var(--primary); padding: 2px 10px;">
+                <span class="timer-display" id="exam-timer">30:00</span>
+            </div>
+        </div>
+        <div class="progress-info" style="display: flex; align-items: center; gap: 1rem;">
+            <span id="progress-text" style="color: var(--primary); font-size: 0.8rem;">MISSION_PROGRESS: 0%</span>
+            <div class="progress-bar-container">
+                <div class="progress-bar-fill" id="progress-bar"></div>
+            </div>
+        </div>
+    </header>
+
+    <main class="workspace">
+        <section class="question-panel">
+            <span class="question-num" id="q-number">DATA_STREAM_01</span>
+            <h3 class="question-title" id="q-title">SCANNING...</h3>
+            <div class="question-desc" id="q-desc-content">
+                INITIALIZING_DESCRIPTION_NODE...
+            </div>
+            <div style="margin-top: auto; padding: 1rem; border: 1px solid var(--error); background: rgba(255,0,85,0.05);">
+                <small style="color: var(--error); letter-spacing: 1px;">WARNING: VIOLATIONS_CAP = 2</small>
+                <div style="font-weight: 700; color: var(--error); margin-top: 0.5rem; font-size: 1.2rem;" id="violation-count">V_LOG: 0</div>
+            </div>
+        </section>
+
+        <section class="editor-container">
+            <div id="monaco-editor"></div>
+            <div class="console-panel">
+                <div class="console-header">
+                    <span>SYSTEM_OUTPUT</span>
+                    <button id="clear-console-btn" style="background:none; color:inherit; font-size:0.6rem; border:1px solid black; cursor:pointer;">CLEAR</button>
+                </div>
+                <div class="console-output" id="console-output">KERNEL_READY...</div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer-nav">
+        <button class="btn btn-nav btn-prev" id="prev-btn" disabled>SKIP NODE</button>
+        <div style="display: flex; gap: 1rem;">
+            <button class="btn btn-nav btn-next" id="next-btn">SUBMIT & VERIFY</button>
+            <button class="btn-submit cyber-glitch" id="final-submit-btn">TERMINATE_MISSION</button>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <!-- Monaco Editor loader -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs/loader.min.js"></script>
+    <!-- Pyodide: Python runtime in browser (v0.25.1 - stable) -->
+    <script src="https://cdn.jsdelivr.net/pyodide/v0.25.1/full/pyodide.js"></script>
+    <!-- Hardcoded Questions Array -->
+    <script src="../js/questions.js"></script>
+    <!-- Test controller (must load AFTER above scripts) -->
+    <script type="module" src="../js/test-controller.js"></script>
+</body>
+</html>

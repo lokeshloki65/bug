@@ -1,0 +1,46 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Admin check function
+    function isAdmin() {
+      return request.auth != null && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    // Users Collection
+    match /users/{userId} {
+      // Anyone logged in can read their own document
+      // Admins can read all user documents
+      allow read: if request.auth != null && (request.auth.uid == userId || isAdmin());
+      
+      // Admins can create new users (students/admins)
+      // Students cannot create users
+      allow create: if isAdmin();
+      
+      // Students can only update their own status/score/mistakes
+      // Admins can update anything
+      allow update: if request.auth != null && (request.auth.uid == userId || isAdmin());
+      
+      // Only admins can delete users
+      allow delete: if isAdmin();
+    }
+
+    // Questions Collection
+    match /questions/{questionId} {
+      // Anyone logged in (students/admins) can read questions
+      allow read: if request.auth != null;
+      
+      // Only admins can add, edit, or delete questions
+      allow write: if isAdmin();
+    }
+
+    // System Status / Settings (if any)
+    match /system/{document=**} {
+      // Students can read system status (e.g. test active)
+      allow read: if request.auth != null;
+      
+      // Only admins can write
+      allow write: if isAdmin();
+    }
+  }
+}

@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Terms & Conditions | Debug Master</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/variables.css">
+  <link rel="stylesheet" href="../css/animations.css">
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: var(--spacing-lg);
+    }
+
+    .rules-card {
+      width: 100%;
+      max-width: 700px;
+      padding: var(--spacing-xl);
+    }
+
+    h1 {
+      margin-bottom: var(--spacing-md);
+      color: var(--primary);
+      text-align: center;
+    }
+
+    .rules-list {
+      background: rgba(15, 23, 42, 0.4);
+      padding: var(--spacing-lg);
+      border-radius: var(--radius);
+      margin-bottom: var(--spacing-xl);
+      max-height: 400px;
+      overflow-y: auto;
+      border: 1px solid var(--glass-border);
+    }
+
+    .rule-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      margin-bottom: 1rem;
+      color: var(--text-main);
+    }
+
+    .rule-icon {
+      color: var(--secondary);
+      font-weight: bold;
+    }
+
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: var(--spacing-lg);
+      cursor: pointer;
+    }
+
+    .checkbox-group input {
+      width: 20px;
+      height: 20px;
+    }
+
+    .actions {
+      display: flex;
+      gap: 1rem;
+    }
+
+    .btn {
+      flex: 1;
+      padding: 1rem;
+      font-size: 1rem;
+    }
+
+    .btn-secondary {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid var(--glass-border);
+      color: var(--text-muted);
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+    }
+
+    .btn-primary:disabled {
+      background: #334155;
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  </style>
+</head>
+<body class="animated-bg">
+
+  <div class="rules-card glass-card fade-in">
+    <h1>Exam Rules & Instructions</h1>
+    
+    <div class="rules-list">
+      <div class="rule-item">
+        <span class="rule-icon">●</span>
+        <span><b>Secure Environment:</b> The test will be conducted in a forced fullscreen mode. Escaping fullscreen is considered a violation.</span>
+      </div>
+      <div class="rule-item">
+        <span class="rule-icon">●</span>
+        <span><b>Anti-Cheating:</b> Tab switching, window switching, or opening Developer Tools will trigger a warning.</span>
+      </div>
+      <div class="rule-item">
+        <span class="rule-icon">●</span>
+        <span><b>Restrictions:</b> Right-click, Copy, Paste, and Text Selection are disabled within the exam environment.</span>
+      </div>
+      <div class="rule-item">
+        <span class="rule-icon">●</span>
+        <span><b>Malpractice:</b> First violation results in a warning. Second violation will lead to **automatic submission** of the test.</span>
+      </div>
+      <div class="rule-item">
+        <span class="rule-icon">●</span>
+        <span><b>Evaluation:</b> Your code will be evaluated strictly against the correct solution. You must fix all bugs before proceeding to the next node.</span>
+      </div>
+      <div class="rule-item">
+        <span class="rule-icon">●</span>
+        <span><b>Timer:</b> You have 30 minutes for all questions. The test submits automatically when time expires.</span>
+      </div>
+    </div>
+
+    <label class="checkbox-group">
+      <input type="checkbox" id="acceptCheckbox">
+      <span>I have read and agree to all terms and conditions.</span>
+    </label>
+
+    <div class="actions">
+      <button class="btn btn-secondary" onclick="history.back()">Back</button>
+      <button class="btn btn-primary" id="startBtn" disabled>Start Test</button>
+    </div>
+  </div>
+
+  <script type="module">
+    import { auth, db } from '../js/firebase-init.js';
+    import { checkAuth } from '../js/auth.js';
+    import { doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    checkAuth('student');
+
+    const checkbox = document.getElementById('acceptCheckbox');
+    const startBtn = document.getElementById('startBtn');
+
+    checkbox.onchange = () => {
+      startBtn.disabled = !checkbox.checked;
+    };
+
+    startBtn.onclick = async () => {
+      const user = auth.currentUser;
+      if (user) {
+        await updateDoc(doc(db, "users", user.uid), {
+          testStatus: 'started',
+          startTime: new Date().toISOString()
+        });
+        window.location.href = 'test.html';
+      }
+    };
+  </script>
+</body>
+</html>

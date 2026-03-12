@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Leaderboard | Debug Master</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/variables.css">
+  <link rel="stylesheet" href="../css/animations.css">
+  <style>
+    body {
+      padding: var(--spacing-xl);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .leaderboard-container {
+      width: 100%;
+      max-width: 800px;
+    }
+
+    h1 {
+      margin-bottom: var(--spacing-xl);
+      text-align: center;
+      background: linear-gradient(to right, #818cf8, #c084fc);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-size: 3rem;
+    }
+
+    .table-card {
+      padding: var(--spacing-md);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th {
+      text-align: left;
+      padding: 1rem;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--glass-border);
+    }
+
+    td {
+      padding: 1.2rem 1rem;
+      border-bottom: 1px solid var(--glass-border);
+      color: var(--text-main);
+    }
+
+    tr:last-child td { border-bottom: none; }
+
+    .rank {
+      font-weight: 700;
+      width: 60px;
+    }
+
+    .rank-1 { color: #fbbf24; font-size: 1.2rem; }
+    .rank-2 { color: #94a3b8; }
+    .rank-3 { color: #b45309; }
+
+    .score-badge {
+      background: rgba(99, 102, 241, 0.2);
+      color: var(--primary);
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      font-weight: 600;
+    }
+
+    .btn-back {
+        margin-top: 2rem;
+        padding: 0.75rem 2rem;
+        background: transparent;
+        border: 1px solid var(--glass-border);
+        color: var(--text-muted);
+    }
+  </style>
+</head>
+<body class="animated-bg">
+
+  <div class="leaderboard-container">
+    <h1 class="fade-in">Hall of Fame</h1>
+    
+    <div class="table-card glass-card fade-in">
+      <table>
+        <thead>
+          <tr>
+            <th>Rank</th>
+            <th>Explorer</th>
+          </tr>
+        </thead>
+        <tbody id="leaderboardBody">
+          <!-- Real-time data here -->
+        </tbody>
+      </table>
+    </div>
+
+    <button class="btn-back hover-scale" onclick="history.back()">Back to Dashboard</button>
+  </div>
+
+  <script type="module">
+    import { db } from '../js/firebase-init.js';
+    import { collection, query, where, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    const leaderboardBody = document.getElementById('leaderboardBody');
+
+    // Real-time updates
+    const q = query(
+      collection(db, "users"), 
+      where("role", "==", "student"),
+      where("testStatus", "==", "completed"),
+      orderBy("percentage", "desc")
+    );
+
+    onSnapshot(q, (snapshot) => {
+      leaderboardBody.innerHTML = '';
+      let rank = 1;
+      snapshot.forEach(docSnap => {
+        const u = docSnap.data();
+        const tr = document.createElement('tr');
+        tr.className = rank <= 3 ? `rank-${rank}` : '';
+        tr.innerHTML = `
+          <td class="rank">#${rank}</td>
+          <td>${u.name || 'Student'}</td>
+        `;
+        leaderboardBody.appendChild(tr);
+        rank++;
+      });
+    });
+  </script>
+</body>
+</html>

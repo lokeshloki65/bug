@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your Results | Debug Master</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/variables.css">
+  <link rel="stylesheet" href="../css/animations.css">
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: var(--spacing-lg);
+    }
+
+    .result-card {
+      width: 100%;
+      max-width: 500px;
+      padding: var(--spacing-xl);
+      text-align: center;
+    }
+
+    .score-circle {
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      border: 8px solid var(--primary);
+      margin: 0 auto var(--spacing-lg);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background: rgba(99, 102, 241, 0.1);
+    }
+
+    .score-value {
+      font-size: 3rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .score-percent {
+      font-size: 1.1rem;
+      color: var(--text-muted);
+    }
+
+    .badge-row {
+        margin-top: 1rem;
+        display: flex;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+    .btn-home {
+      width: 100%;
+      padding: 1rem;
+      background: var(--primary);
+      color: white;
+      text-decoration: none;
+      display: block;
+      margin-top: var(--spacing-lg);
+    }
+
+    .malpractice-alert {
+        background: rgba(239, 68, 68, 0.1);
+        border: 1px solid var(--error);
+        color: var(--error);
+        padding: 1rem;
+        border-radius: var(--radius);
+        margin-top: 1rem;
+        font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body class="animated-bg">
+
+  <div class="result-card glass-card fade-in">
+    <h1 style="margin-bottom: 2rem;">Challenge Completed!</h1>
+    
+    <div class="score-circle">
+      <div class="score-value" style="font-size: 1.5rem;">DONE</div>
+      <div class="score-percent">SAVED</div>
+    </div>
+
+    <h3 id="result-message">Analyzing Performance...</h3>
+    
+    <div id="malpractice-warning" class="malpractice-alert" style="display: none;">
+        Note: Some security alerts were recorded during your attempt.
+    </div>
+
+    <a href="dashboard.html" class="btn-home hover-scale">Return to Dashboard</a>
+  </div>
+
+  <script type="module">
+    import { auth, db } from '../js/firebase-init.js';
+    import { checkAuth } from '../js/auth.js';
+    import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    checkAuth('student');
+
+    auth.onAuthStateChanged(async user => {
+      if (user) {
+        const userDoc = await getDoc(doc(db, "users", user.uid));
+        if (userDoc.exists()) {
+          const data = userDoc.data();
+          const score = data.score || 0;
+          const percent = data.percentage || 0;
+          
+          const msg = document.getElementById('result-message');
+          if (percent >= 80) msg.textContent = "Excellent! You're a Debug Master.";
+          else if (percent >= 50) msg.textContent = "Good job! Keep practicing.";
+          else msg.textContent = "Room for improvement. Study the logic again.";
+
+          if (data.malpracticeCount > 0) {
+              document.getElementById('malpractice-warning').style.display = 'block';
+          }
+        }
+      }
+    });
+  </script>
+</body>
+</html>

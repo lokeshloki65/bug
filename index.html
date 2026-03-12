@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Debug Master | Neural Access Terminal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/animations.css">
+  <style>
+    body {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      font-family: 'Inter', sans-serif;
+      position: relative;
+    }
+
+    /* Background particles */
+    .particle {
+      position: fixed;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 10px;
+      color: rgba(0, 242, 255, 0.12);
+      pointer-events: none;
+      animation: hexFloat 8s ease-in-out infinite;
+      z-index: 0;
+    }
+
+    /* Hero left panel */
+    .hero-text {
+      position: fixed;
+      left: 5%;
+      bottom: 10%;
+      z-index: 1;
+      display: none;
+    }
+
+    @media (min-width: 1100px) { .hero-text { display: block; } }
+
+    .hero-text h2 {
+      font-family: 'Orbitron', monospace;
+      font-size: 0.75rem;
+      color: var(--primary);
+      letter-spacing: 6px;
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+    }
+
+    .hero-text p {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      line-height: 2;
+    }
+
+    /* Login Card */
+    .login-wrapper {
+      position: relative;
+      z-index: 10;
+      width: 100%;
+      max-width: 460px;
+      padding: 1rem;
+    }
+
+    .login-card {
+      padding: 3rem;
+      position: relative;
+      background: rgba(8, 15, 25, 0.95);
+      border: 1px solid var(--glass-border);
+    }
+
+    /* Top tag */
+    .card-tag {
+      position: absolute;
+      top: -1px; left: 20px;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.65rem;
+      color: var(--bg-dark);
+      background: var(--primary);
+      padding: 2px 10px;
+      letter-spacing: 2px;
+    }
+
+    .login-header {
+      margin-bottom: 2.5rem;
+    }
+
+    .login-header .brand {
+      font-family: 'Orbitron', monospace;
+      font-size: 2rem;
+      font-weight: 900;
+      color: var(--primary);
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      text-shadow: 0 0 20px var(--primary-glow);
+      display: block;
+      margin-bottom: 0.25rem;
+    }
+
+    .login-header .tagline {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      letter-spacing: 3px;
+      text-transform: uppercase;
+    }
+
+    /* Role Toggle */
+    .role-toggle {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      border: 1px solid var(--glass-border);
+      margin-bottom: 2rem;
+      overflow: hidden;
+    }
+
+    .role-btn {
+      padding: 0.8rem;
+      background: transparent;
+      color: var(--text-muted);
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      border: none;
+      border-radius: 0;
+      transition: var(--transition);
+      cursor: pointer;
+    }
+
+    .role-btn.active {
+      background: var(--primary-dim);
+      color: var(--primary);
+      box-shadow: inset 0 -2px 0 var(--primary);
+    }
+
+    
+    .role-btn:not(.active):hover {
+      background: rgba(255,255,255,0.03);
+      color: var(--text-main);
+    }
+
+
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+      display: block;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.7rem;
+      color: var(--primary);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 0.5rem;
+    }
+
+    .form-group input {
+      width: 100%;
+      background: rgba(0, 0, 0, 0.6);
+      border: 1px solid rgba(0, 242, 255, 0.2);
+      border-radius: 0;
+      color: var(--text-main);
+      padding: 0.9rem 1rem;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.9rem;
+      transition: var(--transition);
+    }
+
+    .form-group input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 1px var(--primary-glow), inset 0 0 20px rgba(0,242,255,0.03);
+      outline: none;
+    }
+
+    .form-group input::placeholder { color: rgba(255,255,255,0.2); }
+
+    .login-btn {
+      width: 100%;
+      padding: 1rem;
+      margin-top: 0.5rem;
+      background: var(--primary);
+      color: #000;
+      font-family: 'Orbitron', monospace;
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      border: none;
+      cursor: pointer;
+      transition: var(--transition);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .login-btn::before {
+      content: "";
+      position: absolute;
+      top: 50%; left: -100%;
+      width: 100%; height: 200%;
+      background: rgba(255,255,255,0.2);
+      transform: translateY(-50%) skewX(-20deg);
+      transition: left 0.5s ease;
+    }
+
+    .login-btn:hover { box-shadow: 0 0 30px var(--primary-glow); }
+    .login-btn:hover::before { left: 200%; }
+
+    .error-msg {
+      background: rgba(255,62,62,0.08);
+      border: 1px solid var(--error);
+      color: var(--error);
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.75rem;
+      padding: 0.75rem 1rem;
+      margin-top: 1rem;
+      display: none;
+      letter-spacing: 1px;
+    }
+
+    footer {
+      position: fixed;
+      bottom: 1.5rem;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.7rem;
+      color: rgba(255,255,255,0.15);
+      letter-spacing: 5px;
+      text-transform: uppercase;
+      z-index: 10;
+    }
+  </style>
+</head>
+<body class="animated-bg scanline-container">
+
+  <!-- Floating code particles -->
+  <div class="particle" style="top:10%; left:10%; animation-delay:0s;">01001010</div>
+  <div class="particle" style="top:25%; left:80%; animation-delay:1s;">BUG::FIX</div>
+  <div class="particle" style="top:60%; left:5%; animation-delay:2s;">ERR_NULL</div>
+  <div class="particle" style="top:75%; left:88%; animation-delay:3s;">0xDEAD</div>
+  <div class="particle" style="top:45%; left:92%; animation-delay:1.5s;">STACK[]</div>
+  <div class="particle" style="top:85%; left:15%; animation-delay:4s;">SEGFAULT</div>
+
+  <!-- Left hero text -->
+  <div class="hero-text">
+    <h2>Debug Master v2.0</h2>
+    <p>> identify the bug<br>> isolate the error<br>> deploy the fix<br>> mission complete</p>
+  </div>
+
+  <div class="login-wrapper fade-in">
+    <div class="login-card">
+      <span class="card-tag">SYSTEM::AUTH</span>
+
+      <div class="login-header">
+        <span class="brand">DEBUG<span style="color:var(--secondary)">MASTER</span></span>
+        <span class="tagline">Secure Code Intelligence Platform</span>
+      </div>
+
+      <div class="role-toggle">
+        <button class="role-btn active" id="studentRole">&#x25A0; STUDENT</button>
+        <button class="role-btn" id="adminRole">&#x25A0; ADMIN</button>
+      </div>
+
+      <form id="loginForm">
+        <div class="form-group">
+          <label>Identity Key</label>
+          <input type="email" id="email" placeholder="email@address.com" required>
+        </div>
+        <div class="form-group">
+          <label>Access Code</label>
+          <input type="password" id="password" placeholder="••••••••" required>
+        </div>
+        <div id="loginError" class="error-msg">ACCESS DENIED: Invalid credentials provided.</div>
+        <button type="submit" class="login-btn cyber-glitch" data-text="INITIALIZE SESSION">INITIALIZE SESSION</button>
+      </form>
+    </div>
+  </div>
+
+  <footer>DEBUG_MASTER &nbsp;|&nbsp; CODE_CRAFTERS_v2.0</footer>
+
+  <script type="module" src="js/auth.js"></script>
+  <script>
+    const studentBtn = document.getElementById('studentRole');
+    const adminBtn = document.getElementById('adminRole');
+    let selectedRole = 'student';
+
+    studentBtn.onclick = () => {
+      studentBtn.classList.add('active');
+      adminBtn.classList.remove('active');
+      selectedRole = 'student';
+    };
+
+    adminBtn.onclick = () => {
+      adminBtn.classList.add('active');
+      studentBtn.classList.remove('active');
+      selectedRole = 'admin';
+    };
+
+    window.getSelectedRole = () => selectedRole;
+  </script>
+</body>
+</html>

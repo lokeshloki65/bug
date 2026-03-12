@@ -1,0 +1,154 @@
+/* ================= KEYFRAMES ================= */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes glitch {
+  0%   { clip-path: inset(40% 0 61% 0); transform: translate(-2px, 2px); }
+  10%  { clip-path: inset(2% 0 79% 0);  transform: translate(2px, -2px); }
+  20%  { clip-path: inset(53% 0 39% 0); transform: translate(-1px, 1px); }
+  30%  { clip-path: inset(78% 0 1% 0);  transform: translate(1px, 2px); }
+  40%  { clip-path: inset(27% 0 59% 0); transform: translate(0, 0); }
+  50%  { clip-path: inset(90% 0 5% 0);  transform: translate(-2px, 1px); }
+  100% { clip-path: none;               transform: translate(0, 0); }
+}
+
+@keyframes scanline {
+  0%   { transform: translateY(-100vh); }
+  100% { transform: translateY(100vh); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 10px var(--primary-glow), 0 0 20px var(--primary-glow); }
+  50%       { box-shadow: 0 0 25px var(--primary-glow), 0 0 50px var(--primary-glow); }
+}
+
+@keyframes borderRun {
+  0%   { background-position: 0% 0%; }
+  100% { background-position: 200% 200%; }
+}
+
+@keyframes cyberGradient {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes flicker {
+  0%, 19.999%, 22%, 62.999%, 64%, 64.999%, 70%, 100% { opacity: 1; }
+  20%, 21.999%, 63%, 63.999%, 65%, 69.999% { opacity: 0.4; }
+}
+
+@keyframes hexFloat {
+  0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0.08; }
+  50%       { transform: translateY(-25px) rotate(5deg); opacity: 0.15; }
+}
+
+@keyframes rotate360 {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+@keyframes dataStream {
+  0%   { background-position: 0 0; }
+  100% { background-position: 0 200px; }
+}
+
+/* ================= UTILITY CLASSES ================= */
+.fade-in { animation: fadeInUp 0.6s ease forwards; }
+.fade-in-delay-1 { animation: fadeInUp 0.6s 0.1s ease forwards; opacity: 0; }
+.fade-in-delay-2 { animation: fadeInUp 0.6s 0.2s ease forwards; opacity: 0; }
+.fade-in-delay-3 { animation: fadeInUp 0.6s 0.3s ease forwards; opacity: 0; }
+.flicker { animation: flicker 3s infinite; }
+
+.cyber-glitch {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.cyber-glitch:hover::before {
+  content: attr(data-text);
+  position: absolute;
+  top: 0; left: 2px;
+  color: var(--secondary);
+  animation: glitch 0.4s infinite;
+  clip-path: inset(0);
+}
+
+/* ================= ANIMATED BACKGROUND ================= */
+.animated-bg {
+  background: 
+    radial-gradient(ellipse at 15% 50%, rgba(0, 242, 255, 0.05) 0%, transparent 55%),
+    radial-gradient(ellipse at 85% 50%, rgba(188, 19, 254, 0.05) 0%, transparent 55%),
+    #020408;
+}
+
+/* Grid pattern */
+.animated-bg::before {
+  content: "";
+  position: fixed;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background-image: 
+    linear-gradient(rgba(0, 242, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 242, 255, 0.04) 1px, transparent 1px);
+  background-size: 50px 50px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ================= SCANLINE ================= */
+.scanline-container { position: relative; }
+
+.scanline-container::after {
+  content: "";
+  position: fixed;
+  top: 0; left: 0; width: 100%; height: 3px;
+  background: linear-gradient(transparent, var(--primary), transparent);
+  opacity: 0.2;
+  animation: scanline 6s linear infinite;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* ================= CYBER CARD ================= */
+.cyber-card {
+  background: var(--bg-card);
+  border: 1px solid var(--glass-border);
+  position: relative;
+  box-shadow: 
+    0 0 0 1px rgba(0,0,0,0.3),
+    0 20px 60px rgba(0,0,0,0.8),
+    inset 0 1px 0 rgba(255,255,255,0.05);
+}
+
+/* Corner decorations */
+.cyber-card::before {
+  content: "";
+  position: absolute;
+  top: -1px; right: -1px;
+  width: 20px; height: 20px;
+  border-top: 2px solid var(--primary);
+  border-right: 2px solid var(--primary);
+}
+
+.cyber-card::after {
+  content: "";
+  position: absolute;
+  bottom: -1px; left: -1px;
+  width: 20px; height: 20px;
+  border-bottom: 2px solid var(--primary);
+  border-left: 2px solid var(--primary);
+}
+
+/* Pulsing glow on cards */
+.cyber-card:hover {
+  animation: pulse-glow 2s ease infinite;
+  border-color: rgba(0, 242, 255, 0.4);
+}

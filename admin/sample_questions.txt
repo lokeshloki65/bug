@@ -1,0 +1,450 @@
+TITLE: Debug Python Program 1 (Sum and Average)
+LANGUAGE: python
+BUGGY:
+print("Program 1 start")
+nums = [10,20,30,40]
+total = 0
+for n in nums
+    total = total + n
+avg = total / len(nums)
+print("Average:", avg)
+print("Program end")
+CORRECT:
+print("Program 1 start")
+nums = [10,20,30,40]
+total = 0
+for n in nums:
+    total = total + n
+avg = total / len(nums)
+print("Average:", avg)
+print("Program end")
+---
+TITLE: Debug Python Program 2 (Factorial)
+LANGUAGE: python
+BUGGY:
+print("Program 2 start")
+num = 5
+fact = 1
+for i in range(1, num+1)
+    fact = fact * i
+print("Factorial:", fact)
+print("Program end")
+CORRECT:
+print("Program 2 start")
+num = 5
+fact = 1
+for i in range(1, num+1):
+    fact = fact * i
+print("Factorial:", fact)
+print("Program end")
+---
+TITLE: Debug Python Program 3 (Even or Odd)
+LANGUAGE: python
+BUGGY:
+print("Program 3 start")
+num = 7
+if num % 2 == 0
+    print("Even number")
+else
+    print("Odd number")
+print("Program end")
+CORRECT:
+print("Program 3 start")
+num = 7
+if num % 2 == 0:
+    print("Even number")
+else:
+    print("Odd number")
+print("Program end")
+---
+TITLE: Debug Python Program 4 (Multiply array elements)
+LANGUAGE: python
+BUGGY:
+print("Program 4 start")
+nums = [3,6,9,12]
+for n in nums
+    print(n * 2)
+print("Program end")
+CORRECT:
+print("Program 4 start")
+nums = [3,6,9,12]
+for n in nums:
+    print(n * 2)
+print("Program end")
+---
+TITLE: Debug Python Program 5 (Sum of 1 to 5)
+LANGUAGE: python
+BUGGY:
+print("Program 5 start")
+total = 0
+for i in range(1,6)
+    total = total + i
+print("Sum:", total)
+print("Program end")
+CORRECT:
+print("Program 5 start")
+total = 0
+for i in range(1,6):
+    total = total + i
+print("Sum:", total)
+print("Program end")
+---
+TITLE: Debug Python Program 6 (Largest number in array)
+LANGUAGE: python
+BUGGY:
+print("Program 6 start")
+nums = [5,10,15]
+largest = nums[0]
+for n in nums
+    if n > largest
+        largest = n
+print("Largest:", largest)
+print("Program end")
+CORRECT:
+print("Program 6 start")
+nums = [5,10,15]
+largest = nums[0]
+for n in nums:
+    if n > largest:
+        largest = n
+print("Largest:", largest)
+print("Program end")
+---
+TITLE: Debug Python Program 7 (Print characters of a string)
+LANGUAGE: python
+BUGGY:
+print("Program 7 start")
+text = "python"
+for ch in text
+    print(ch)
+print("Program end")
+CORRECT:
+print("Program 7 start")
+text = "python"
+for ch in text:
+    print(ch)
+print("Program end")
+---
+TITLE: Debug Python Program 8 (Sum with += operator)
+LANGUAGE: python
+BUGGY:
+print("Program 8 start")
+nums = [2,4,6,8]
+total = 0
+for n in nums
+    total += n
+print("Total:", total)
+print("Program end")
+CORRECT:
+print("Program 8 start")
+nums = [2,4,6,8]
+total = 0
+for n in nums:
+    total += n
+print("Total:", total)
+print("Program end")
+---
+TITLE: Debug Python Program 9 (Reverse a number)
+LANGUAGE: python
+BUGGY:
+print("Program 9 start")
+num = 123
+rev = 0
+while num > 0
+    digit = num % 10
+    rev = rev * 10 + digit
+    num = num // 10
+print("Reverse:", rev)
+print("Program end")
+CORRECT:
+print("Program 9 start")
+num = 123
+rev = 0
+while num > 0:
+    digit = num % 10
+    rev = rev * 10 + digit
+    num = num // 10
+print("Reverse:", rev)
+print("Program end")
+---
+TITLE: Debug Python Program 10 (Count elements)
+LANGUAGE: python
+BUGGY:
+print("Program 10 start")
+nums = [1,3,5,7]
+count = 0
+for n in nums
+    count = count + 1
+print("Count:", count)
+print("Program end")
+CORRECT:
+print("Program 10 start")
+nums = [1,3,5,7]
+count = 0
+for n in nums:
+    count = count + 1
+print("Count:", count)
+print("Program end")
+---
+TITLE: Debug C Program 11 (Factorial)
+LANGUAGE: c
+BUGGY:
+#include <stdio.h>
+int main() {
+    int num = 5, fact = 1
+    for(int i=1;i<=num;i++)
+        fact = fact * i
+    printf("Factorial = %d", fact)
+    return 0
+}
+CORRECT:
+#include <stdio.h>
+int main() {
+    int num = 5, fact = 1;
+    for(int i=1;i<=num;i++)
+        fact = fact * i;
+    printf("Factorial = %d", fact);
+    return 0;
+}
+---
+TITLE: Debug C Program 12 (Even or Odd)
+LANGUAGE: c
+BUGGY:
+#include <stdio.h>
+int main() {
+    int num = 10
+    if(num % 2 == 0)
+        printf("Even")
+    else
+        printf("Odd")
+    return 0
+}
+CORRECT:
+#include <stdio.h>
+int main() {
+    int num = 10;
+    if(num % 2 == 0)
+        printf("Even");
+    else
+        printf("Odd");
+    return 0;
+}
+---
+TITLE: Debug C Program 13 (Sum of numbers)
+LANGUAGE: c
+BUGGY:
+#include <stdio.h>
+int main() {
+    int sum = 0
+    for(int i=1;i<=5;i++)
+        sum = sum + i
+    printf("Sum = %d", sum)
+    return 0
+}
+CORRECT:
+#include <stdio.h>
+int main() {
+    int sum = 0;
+    for(int i=1;i<=5;i++)
+        sum = sum + i;
+    printf("Sum = %d", sum);
+    return 0;
+}
+---
+TITLE: Debug C Program 14 (Multiplication table)
+LANGUAGE: c
+BUGGY:
+#include <stdio.h>
+int main() {
+    int n = 5
+    for(int i=1;i<=10;i++)
+        printf("%d\n", n*i)
+    return 0
+}
+CORRECT:
+#include <stdio.h>
+int main() {
+    int n = 5;
+    for(int i=1;i<=10;i++)
+        printf("%d\n", n*i);
+    return 0;
+}
+---
+TITLE: Debug C Program 15 (Largest number)
+LANGUAGE: c
+BUGGY:
+#include <stdio.h>
+int main() {
+    int a=5,b=9,c=3
+    int largest
+    if(a>b && a>c)
+        largest = a
+    else if(b>c)
+        largest = b
+    else
+        largest = c
+    printf("%d", largest)
+    return 0
+}
+CORRECT:
+#include <stdio.h>
+int main() {
+    int a=5,b=9,c=3;
+    int largest;
+    if(a>b && a>c)
+        largest = a;
+    else if(b>c)
+        largest = b;
+    else
+        largest = c;
+    printf("%d", largest);
+    return 0;
+}
+---
+TITLE: Debug C Program 16 (Reverse number)
+LANGUAGE: c
+BUGGY:
+#include <stdio.h>
+int main() {
+    int num=123,rev=0
+    while(num>0)
+    {
+        int d=num%10
+        rev=rev*10+d
+        num=num/10
+    }
+    printf("%d",rev)
+    return 0
+}
+CORRECT:
+#include <stdio.h>
+int main() {
+    int num=123,rev=0;
+    while(num>0)
+    {
+        int d=num%10;
+        rev=rev*10+d;
+        num=num/10;
+    }
+    printf("%d",rev);
+    return 0;
+}
+---
+TITLE: Debug C Program 17 (Palindrome check)
+LANGUAGE: c
+BUGGY:
+#include <stdio.h>
+int main() {
+    int num=121,rev=0,temp
+    temp=num
+    while(num>0)
+    {
+        int d=num%10
+        rev=rev*10+d
+        num=num/10
+    }
+    if(temp==rev)
+        printf("Palindrome")
+    else
+        printf("Not Palindrome")
+    return 0
+}
+CORRECT:
+#include <stdio.h>
+int main() {
+    int num=121,rev=0,temp;
+    temp=num;
+    while(num>0)
+    {
+        int d=num%10;
+        rev=rev*10+d;
+        num=num/10;
+    }
+    if(temp==rev)
+        printf("Palindrome");
+    else
+        printf("Not Palindrome");
+    return 0;
+}
+---
+TITLE: Debug C Program 18 (Prime check)
+LANGUAGE: c
+BUGGY:
+#include <stdio.h>
+int main() {
+    int num=7,count=0
+    for(int i=1;i<=num;i++)
+        if(num%i==0)
+            count++
+    if(count==2)
+        printf("Prime")
+    else
+        printf("Not Prime")
+    return 0
+}
+CORRECT:
+#include <stdio.h>
+int main() {
+    int num=7,count=0;
+    for(int i=1;i<=num;i++)
+        if(num%i==0)
+            count++;
+    if(count==2)
+        printf("Prime");
+    else
+        printf("Not Prime");
+    return 0;
+}
+---
+TITLE: Debug C Program 19 (Array sum)
+LANGUAGE: c
+BUGGY:
+#include <stdio.h>
+int main() {
+    int arr[3]={1,2,3}
+    int sum=0
+    for(int i=0;i<3;i++)
+        sum=sum+arr[i]
+    printf("%d",sum)
+    return 0
+}
+CORRECT:
+#include <stdio.h>
+int main() {
+    int arr[3]={1,2,3};
+    int sum=0;
+    for(int i=0;i<3;i++)
+        sum=sum+arr[i];
+    printf("%d",sum);
+    return 0;
+}
+---
+TITLE: Debug C Program 20 (Fibonacci series)
+LANGUAGE: c
+BUGGY:
+#include <stdio.h>
+int main() {
+    int a=0,b=1,c
+    for(int i=1;i<=5;i++)
+    {
+        printf("%d ",a)
+        c=a+b
+        a=b
+        b=c
+    }
+    return 0
+}
+CORRECT:
+#include <stdio.h>
+int main() {
+    int a=0,b=1,c;
+    for(int i=1;i<=5;i++)
+    {
+        printf("%d ",a);
+        c=a+b;
+        a=b;
+        b=c;
+    }
+    return 0;
+}
+

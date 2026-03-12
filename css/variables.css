@@ -1,0 +1,92 @@
+:root {
+  /* Cyber-Debugging Palette */
+  --primary: #00f2ff;
+  --primary-glow: rgba(0, 242, 255, 0.35);
+  --primary-dim: rgba(0, 242, 255, 0.08);
+  --secondary: #bc13fe;
+  --secondary-glow: rgba(188, 19, 254, 0.35);
+  --accent: #39ff14;
+  --accent-glow: rgba(57, 255, 20, 0.3);
+  --bg-dark: #020408;
+  --bg-card: rgba(8, 15, 25, 0.92);
+  --glass-border: rgba(0, 242, 255, 0.18);
+  --text-main: #ffffff;
+  --text-muted: #8899aa;
+  --error: #ff3e3e;
+  --error-glow: rgba(255, 62, 62, 0.3);
+  --success: #3ef0a1;
+  --success-glow: rgba(62, 240, 161, 0.3);
+  --warning: #ffcc00;
+
+  /* Spacing */
+  --spacing-xs: 0.5rem;
+  --spacing-sm: 1rem;
+  --spacing-md: 1.5rem;
+  --spacing-lg: 2rem;
+  --spacing-xl: 3rem;
+
+  /* Effects */
+  --blur: 20px;
+  --radius: 2px;
+  --shadow: 0 0 30px var(--primary-glow);
+  --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  --cyber-border: 1px solid var(--primary);
+}
+
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Outfit', 'Inter', sans-serif;
+  background-color: var(--bg-dark);
+  color: var(--text-main);
+  min-height: 100vh;
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: #000; }
+::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 0; }
+
+.glass-card {
+  background: var(--bg-card);
+  backdrop-filter: blur(var(--blur));
+  -webkit-backdrop-filter: blur(var(--blur));
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius);
+  box-shadow: 0 0 25px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05);
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  border-radius: var(--radius);
+  font-weight: 600;
+  transition: var(--transition);
+}
+
+input, select, textarea {
+  background: rgba(0, 242, 255, 0.04);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius);
+  color: var(--text-main);
+  padding: 0.75rem 1rem;
+  transition: var(--transition);
+  font-family: 'Share Tech Mono', monospace;
+  width: 100%;
+}
+
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px var(--primary-glow);
+}
+
+textarea { min-height: 120px; resize: vertical; }
+
+select option { background: #0a0f1a; color: var(--text-main); }

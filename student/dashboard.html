@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mission Control | Debug Master</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/variables.css">
+  <link rel="stylesheet" href="../css/animations.css">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      position: relative;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 700px;
+      position: relative;
+      z-index: 10;
+    }
+
+    /* Top bar */
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+      border-bottom: 1px solid var(--glass-border);
+      padding-bottom: 1rem;
+    }
+
+    .logo {
+      font-family: 'Orbitron', monospace;
+      font-size: 1.1rem;
+      font-weight: 900;
+      color: var(--primary);
+      letter-spacing: 2px;
+    }
+
+    .logo span { color: var(--secondary); }
+
+    /* Profile Card */
+    .profile-card {
+      padding: 2rem;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+    }
+
+    .avatar {
+      width: 90px;
+      height: 90px;
+      background: linear-gradient(135deg, var(--primary-dim), rgba(188,19,254,0.1));
+      border: 2px solid var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Orbitron', monospace;
+      font-size: 2rem;
+      font-weight: 900;
+      color: var(--primary);
+      text-shadow: 0 0 20px var(--primary-glow);
+      flex-shrink: 0;
+      position: relative;
+    }
+
+    .avatar::before {
+      content: "";
+      position: absolute;
+      inset: 4px;
+      border: 1px solid rgba(0,242,255,0.2);
+    }
+
+    .profile-info .greeting {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      margin-bottom: 0.3rem;
+    }
+
+    .profile-info .name {
+      font-family: 'Orbitron', monospace;
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 0.3rem;
+    }
+
+    .profile-info .email {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    /* Stats row */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .stat-chip {
+      padding: 1.2rem;
+      background: rgba(0, 242, 255, 0.04);
+      border: 1px solid var(--glass-border);
+      text-align: center;
+    }
+
+    .stat-chip .val {
+      font-family: 'Orbitron', monospace;
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    .stat-chip .lbl {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-top: 0.3rem;
+    }
+
+    /* Mission Card */
+    .mission-card {
+      padding: 2rem;
+      margin-bottom: 1.5rem;
+      border-left: 3px solid var(--secondary);
+    }
+
+    .mission-label {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.7rem;
+      color: var(--secondary);
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      margin-bottom: 0.8rem;
+    }
+
+    .mission-name {
+      font-family: 'Orbitron', monospace;
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .mission-desc {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-top: 0.5rem;
+    }
+
+    /* Start Button */
+    .start-btn {
+      width: 100%;
+      padding: 1.5rem;
+      background: linear-gradient(135deg, var(--primary) 0%, #00a8b5 100%);
+      color: #000;
+      font-family: 'Orbitron', monospace;
+      font-size: 1rem;
+      font-weight: 900;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      border: none;
+      cursor: pointer;
+      transition: var(--transition);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .start-btn::before {
+      content: "";
+      position: absolute;
+      top: 50%; left: -100%;
+      width: 100%; height: 200%;
+      background: rgba(255,255,255,0.15);
+      transform: translateY(-50%) skewX(-20deg);
+      transition: left 0.5s ease;
+    }
+
+    .start-btn:hover:not(:disabled) {
+      box-shadow: 0 0 40px var(--primary-glow);
+      transform: translateY(-2px);
+    }
+
+    .start-btn:hover:not(:disabled)::before { left: 200%; }
+
+    .start-btn:disabled {
+      background: #1a1a2e;
+      color: #334155;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .start-btn.completed {
+      background: linear-gradient(135deg, var(--success) 0%, #00a87a 100%);
+      cursor: not-allowed;
+    }
+
+    /* Nav */
+    .nav-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .nav-btn {
+      padding: 0.9rem;
+      text-decoration: none;
+      display: block;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      text-align: center;
+      border: 1px solid var(--glass-border);
+      color: var(--text-muted);
+      transition: var(--transition);
+      background: transparent;
+      cursor: pointer;
+    }
+
+    .nav-btn:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-dim); }
+    .nav-btn.danger { color: var(--error); border-color: rgba(255, 62, 62, 0.2); }
+    .nav-btn.danger:hover { border-color: var(--error); background: var(--error-glow); color: var(--error); }
+  </style>
+</head>
+<body class="animated-bg scanline-container">
+
+  <div class="container fade-in" style="z-index:10;">
+    <div class="topbar">
+      <div class="logo">DEBUG<span>MASTER</span></div>
+      <span style="font-family:'Share Tech Mono';font-size:0.7rem;color:var(--text-muted);letter-spacing:2px;">OPERATOR TERMINAL</span>
+    </div>
+
+    <div class="profile-card cyber-card">
+      <div class="avatar" id="userInitial">U</div>
+      <div class="profile-info">
+        <div class="greeting">Identity Confirmed</div>
+        <div class="name" id="userName">LOADING...</div>
+        <div class="email" id="userEmail">retrieving data...</div>
+      </div>
+    </div>
+
+    <div class="stats-row fade-in-delay-1">
+      <div class="stat-chip">
+        <div class="val" id="statQuestions">--</div>
+        <div class="lbl">Questions</div>
+      </div>
+      <div class="stat-chip">
+        <div class="val" id="statTime">30</div>
+        <div class="lbl">Minutes</div>
+      </div>
+      <div class="stat-chip">
+        <div class="val" id="statScore">--</div>
+        <div class="lbl">Score</div>
+      </div>
+    </div>
+
+    <div class="mission-card glass-card fade-in-delay-2">
+      <div class="mission-label">&gt; Active Mission</div>
+      <div class="mission-name" id="testStatus">DEBUG_SEQUENCE_01</div>
+      <div class="mission-desc">Identify and fix all bugs in the code segments. Each correctly fixed bug earns you marks.</div>
+    </div>
+
+    <button id="startTestBtn" class="start-btn cyber-glitch" data-text="LAUNCH MISSION">LAUNCH MISSION</button>
+
+    <div class="nav-row fade-in-delay-3">
+      <a href="leaderboard.html" class="nav-btn">&#x25B8; Rankings</a>
+      <a href="#" class="nav-btn danger" id="logoutBtn">&#x25A0; Terminate Session</a>
+    </div>
+  </div>
+
+  <script type="module">
+    import { auth, db } from '../js/firebase-init.js';
+    import { checkAuth, logout } from '../js/auth.js';
+    import { doc, onSnapshot, collection, getCountFromServer } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    checkAuth('student');
+
+    const userName = document.getElementById('userName');
+    const userEmail = document.getElementById('userEmail');
+    const userInitial = document.getElementById('userInitial');
+    const testStatus = document.getElementById('testStatus');
+    const startTestBtn = document.getElementById('startTestBtn');
+    const statScore = document.getElementById('statScore');
+    const statQuestions = document.getElementById('statQuestions');
+
+    // Get question count
+    getCountFromServer(collection(db, "questions")).then(snap => {
+      statQuestions.textContent = snap.data().count;
+    }).catch(() => { statQuestions.textContent = '25'; });
+
+    auth.onAuthStateChanged(user => {
+      if (user) {
+        onSnapshot(doc(db, "users", user.uid), (docSnap) => {
+          if (docSnap.exists()) {
+            const data = docSnap.data();
+            userName.textContent = (data.name || 'OPERATOR').toUpperCase();
+            userEmail.textContent = user.email;
+            userInitial.textContent = (data.name || 'U').charAt(0).toUpperCase();
+
+            if (data.testStatus === 'completed') {
+              testStatus.innerHTML = `<span style="color:var(--success)">MISSION ACCOMPLISHED</span>`;
+              statScore.textContent = `COMPLETED`;
+              startTestBtn.textContent = 'MISSION COMPLETE';
+              startTestBtn.classList.add('completed');
+              startTestBtn.disabled = true;
+            } else if (data.testStatus === 'started') {
+              testStatus.textContent = 'MISSION IN PROGRESS...';
+              startTestBtn.textContent = 'RESUME MISSION';
+              statScore.textContent = '--';
+            } else {
+              statScore.textContent = '--';
+            }
+          }
+        });
+      }
+    });
+
+    startTestBtn.onclick = () => { window.location.href = 'rules.html'; };
+    document.getElementById('logoutBtn').onclick = logout;
+  </script>
+</body>
+</html>

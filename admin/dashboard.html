@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Command Center | Debug Master</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/variables.css">
+  <link rel="stylesheet" href="../css/animations.css">
+  <style>
+    body {
+      display: flex;
+      background: var(--bg-dark);
+      min-height: 100vh;
+      font-family: 'Inter', sans-serif;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 240px;
+      height: 100vh;
+      position: fixed;
+      left: 0; top: 0;
+      background: rgba(4, 8, 14, 0.98);
+      border-right: 1px solid var(--glass-border);
+      display: flex;
+      flex-direction: column;
+      padding: 0;
+      z-index: 100;
+    }
+
+    .sidebar-brand {
+      padding: 1.5rem;
+      border-bottom: 1px solid var(--glass-border);
+    }
+
+    .sidebar-brand h2 {
+      font-family: 'Orbitron', monospace;
+      font-size: 1rem;
+      font-weight: 900;
+      color: var(--primary);
+      letter-spacing: 2px;
+    }
+
+    .sidebar-brand h2 span { color: var(--secondary); }
+
+    .sidebar-brand p {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.6rem;
+      color: var(--text-muted);
+      letter-spacing: 3px;
+      margin-top: 0.3rem;
+    }
+
+    nav { flex: 1; padding: 1rem 0; }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      padding: 0.9rem 1.5rem;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-decoration: none;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      transition: var(--transition);
+      border-left: 2px solid transparent;
+      cursor: pointer;
+    }
+
+    .nav-item:hover, .nav-item.active {
+      color: var(--primary);
+      border-left-color: var(--primary);
+      background: var(--primary-dim);
+    }
+
+    .nav-item .icon { font-size: 1rem; }
+
+    .sidebar-footer {
+      padding: 1rem 1.5rem;
+      border-top: 1px solid var(--glass-border);
+    }
+
+    .logout-btn {
+      width: 100%;
+      padding: 0.8rem;
+      background: transparent;
+      border: 1px solid rgba(255,62,62,0.2);
+      color: var(--error);
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.75rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .logout-btn:hover { background: var(--error-glow); border-color: var(--error); }
+
+    /* Main */
+    .main {
+      margin-left: 240px;
+      flex: 1;
+      padding: 2rem;
+    }
+
+    /* Page Header */
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-bottom: 2rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--glass-border);
+    }
+
+    .page-header h1 {
+      font-family: 'Orbitron', monospace;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .page-header .subtitle {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      letter-spacing: 2px;
+      margin-top: 0.3rem;
+    }
+
+    /* Stats Grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.2rem;
+      margin-bottom: 2rem;
+    }
+
+    .stat-card {
+      padding: 1.5rem;
+      background: var(--bg-card);
+      border: 1px solid var(--glass-border);
+      position: relative;
+      overflow: hidden;
+      transition: var(--transition);
+    }
+
+    .stat-card::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 2px;
+      background: var(--primary);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.4s ease;
+    }
+
+    .stat-card:hover::before { transform: scaleX(1); }
+    .stat-card:hover { border-color: var(--primary); transform: translateY(-2px); }
+
+    .stat-val {
+      font-family: 'Orbitron', monospace;
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 0.4rem;
+      text-shadow: 0 0 20px var(--primary-glow);
+    }
+
+    .stat-label {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    .stat-icon {
+      position: absolute;
+      bottom: 1rem; right: 1rem;
+      font-size: 2rem;
+      opacity: 0.06;
+      color: var(--primary);
+    }
+
+    /* Section */
+    .section-card {
+      background: var(--bg-card);
+      border: 1px solid var(--glass-border);
+    }
+
+    .section-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.2rem 1.5rem;
+      border-bottom: 1px solid var(--glass-border);
+    }
+
+    .section-title {
+      font-family: 'Orbitron', monospace;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--text-main);
+      letter-spacing: 2px;
+    }
+
+    .btn-actions { display: flex; gap: 0.7rem; align-items: center; flex-wrap: wrap; }
+
+    .btn {
+      padding: 0.5rem 1rem;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: var(--transition);
+      border: 1px solid var(--glass-border);
+      color: var(--text-muted);
+      background: transparent;
+    }
+
+    .btn:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-dim); }
+
+    .btn-cyan { border-color: var(--primary); color: var(--primary); }
+    .btn-cyan:hover { background: var(--primary); color: #000; box-shadow: 0 0 20px var(--primary-glow); }
+
+    .btn-purple { border-color: var(--secondary); color: var(--secondary); }
+    .btn-purple:hover { background: var(--secondary); color: #fff; box-shadow: 0 0 20px var(--secondary-glow); }
+
+    .btn-green { border-color: var(--success); color: var(--success); }
+    .btn-green:hover { background: var(--success); color: #000; box-shadow: 0 0 20px var(--success-glow); }
+
+    .btn-red { border-color: var(--error); color: var(--error); }
+    .btn-red:hover { background: var(--error); color: #fff; }
+
+    /* Table */
+    table { width: 100%; border-collapse: collapse; }
+
+    thead th {
+      padding: 0.9rem 1.5rem;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.65rem;
+      color: var(--primary);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      border-bottom: 1px solid var(--glass-border);
+      text-align: left;
+      background: rgba(0,242,255,0.02);
+    }
+
+    tbody td {
+      padding: 1rem 1.5rem;
+      font-size: 0.85rem;
+      color: var(--text-main);
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+
+    tbody tr:hover { background: rgba(0,242,255,0.02); }
+
+    .badge {
+      padding: 0.25rem 0.7rem;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      border: 1px solid currentColor;
+      display: inline-block;
+    }
+
+    .badge-success { color: var(--success); }
+    .badge-error { color: var(--error); }
+    .badge-warning { color: var(--warning); }
+    .badge-muted { color: var(--text-muted); }
+
+    /* Modal */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(10px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+
+    .modal-box {
+      background: #050d15;
+      border: 1px solid var(--primary);
+      width: 100%;
+      max-width: 680px;
+      max-height: 90vh;
+      overflow-y: auto;
+      position: relative;
+    }
+
+    .modal-header {
+      padding: 1.5rem;
+      border-bottom: 1px solid var(--glass-border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-header h3 {
+      font-family: 'Orbitron', monospace;
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--primary);
+      letter-spacing: 2px;
+    }
+
+    .modal-close {
+      background: none; border: none;
+      color: var(--text-muted); font-size: 1.2rem;
+      cursor: pointer;
+    }
+
+    .modal-close:hover { color: var(--error); }
+
+    .modal-body { padding: 1.5rem; }
+
+    .form-group { margin-bottom: 1.2rem; }
+
+    .form-group label {
+      display: block;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.7rem;
+      color: var(--primary);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 0.5rem;
+    }
+
+    .form-group input, .form-group select, .form-group textarea {
+      background: rgba(0,0,0,0.6);
+      border: 1px solid var(--glass-border);
+      color: var(--text-main);
+      padding: 0.8rem 1rem;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.85rem;
+      border-radius: 0;
+    }
+
+    .form-group textarea { min-height: 120px; }
+
+    .form-actions { display: flex; gap: 1rem; margin-top: 1.5rem; }
+    .form-actions button { flex: 1; padding: 0.9rem; font-size: 0.8rem; }
+
+    /* Empty state */
+    .empty-state {
+      padding: 4rem 2rem;
+      text-align: center;
+    }
+
+    .empty-state p {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      letter-spacing: 2px;
+    }
+
+    /* Export buttons bar */
+    .export-bar {
+      padding: 0.8rem 1.5rem;
+      background: rgba(0,0,0,0.4);
+      border-top: 1px solid var(--glass-border);
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .export-bar span {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      letter-spacing: 2px;
+    }
+  </style>
+</head>
+<body class="animated-bg scanline-container">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <h2>DEBUG<span>MASTER</span></h2>
+      <p>COMMAND CENTER</p>
+    </div>
+    <nav>
+      <a class="nav-item active" id="link-overview">
+        <span class="icon">⬡</span> Overview
+      </a>
+      <a class="nav-item" id="link-questions">
+        <span class="icon">⬡</span> Logic Nodes
+      </a>
+      <a class="nav-item" id="link-students">
+        <span class="icon">⬡</span> Operators
+      </a>
+      <a class="nav-item" id="link-departments">
+        <span class="icon">⬡</span> Departments
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="logout-btn" id="logoutBtn">&#x25A0; TERMINATE SESSION</button>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main">
+
+    <!-- OVERVIEW SECTION -->
+    <section id="sec-overview">
+      <div class="page-header">
+        <div>
+          <h1>SYSTEM OVERVIEW</h1>
+          <div class="subtitle">REAL-TIME INTELLIGENCE DASHBOARD</div>
+        </div>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-val" id="totalStudentsCount">0</div>
+          <div class="stat-label">Total Operators</div>
+          <div class="stat-icon">◈</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-val" id="testsCompletedCount">0</div>
+          <div class="stat-label">Missions Complete</div>
+          <div class="stat-icon">◉</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-val" id="avgScorePercent">0%</div>
+          <div class="stat-label">Avg Sync Rate</div>
+          <div class="stat-icon">◈</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-val" id="totalQuestionsCount">0</div>
+          <div class="stat-label">Logic Nodes</div>
+          <div class="stat-icon">◉</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- QUESTIONS SECTION -->
+    <section id="sec-questions" style="display:none;">
+      <div class="page-header">
+        <div>
+          <h1>LOGIC NODES</h1>
+          <div class="subtitle">QUESTION MANAGEMENT</div>
+        </div>
+      </div>
+      <div class="section-card">
+        <div class="section-top">
+          <span class="section-title">ALL NODES</span>
+          <div class="btn-actions">
+            <a href="sample_questions.txt" download class="btn">GET SAMPLE</a>
+            <input type="file" id="txtUploadInput" style="display:none;" accept=".txt">
+            <button class="btn btn-purple" id="uploadTxtBtn">UPLOAD TXT</button>
+            <button class="btn btn-cyan" id="addQuestionBtn">+ ADD NODE</button>
+          </div>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Title</th>
+              <th>Language</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="questionsTableBody">
+          </tbody>
+        </table>
+        <div id="questionsEmpty" class="empty-state" style="display:none;">
+          <p>NO LOGIC NODES FOUND. UPLOAD A TXT FILE OR ADD MANUALLY.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- STUDENTS SECTION -->
+    <section id="sec-students" style="display:none;">
+      <div class="page-header">
+        <div>
+          <h1>OPERATORS</h1>
+          <div class="subtitle">STUDENT MANAGEMENT & RESULTS</div>
+        </div>
+      </div>
+
+      <!-- BULK SECTION -->
+      <div class="section-card" style="border-color: var(--secondary); margin-bottom: 2rem; border-width: 2px;">
+        <div class="section-top" style="background: rgba(188, 19, 254, 0.05);">
+          <span class="section-title" style="color: var(--secondary); font-size: 0.9rem;">&#x2630; BULK REGISTRATION</span>
+          <div class="btn-actions">
+            <button class="btn btn-purple" id="importOperatorsBtn" style="background: var(--secondary); color: #fff; font-weight: bold;">UPLOAD EXCEL (.xlsx)</button>
+            <button class="btn btn-cyan" id="downloadTemplateBtn">GET TEMPLATE</button>
+            <input type="file" id="excelUploadInput" style="display:none;" accept=".xlsx, .xls">
+          </div>
+        </div>
+        <div style="padding: 1rem 1.5rem; font-size: 0.75rem; color: var(--text-muted); font-family: 'Share Tech Mono';">
+          COLUMNS NEEDED: Name, Email, Password (min 6 chars), Department, College, Phone
+        </div>
+      </div>
+
+      <div class="section-card">
+        <div class="section-top">
+          <span class="section-title">OPERATOR MATRIX</span>
+          <div class="btn-actions">
+            <button class="btn btn-green" id="exportExcelBtn">&#x21E9; EXPORT EXCEL</button>
+            <button class="btn btn-cyan" id="exportPdfBtn">&#x21E9; EXPORT PDF</button>
+            <button class="btn btn-cyan" id="addStudentBtn">+ REGISTER</button>
+          </div>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Score</th>
+              <th>Status</th>
+              <th>Violations</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="studentsTableBody"></tbody>
+        </table>
+        <div id="studentsEmpty" class="empty-state" style="display:none;">
+          <p>NO OPERATORS REGISTERED YET.</p>
+        </div>
+        <div class="export-bar">
+          <span>EXPORT FORMAT:</span>
+          <button class="btn btn-green" id="exportExcelBtn2">&#x21E9; EXCEL (.xlsx)</button>
+          <button class="btn btn-cyan" id="exportPdfBtn2">&#x21E9; PDF REPORT</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- DEPARTMENTS SECTION -->
+    <section id="sec-departments" style="display:none;">
+      <div class="page-header">
+        <div>
+          <h1>DEPARTMENTS</h1>
+          <div class="subtitle">REAL-TIME PERFORMANCE METRICS</div>
+        </div>
+      </div>
+      <div id="departmentsContainer">
+        <div id="departmentsEmpty" class="empty-state" style="display:none;">
+          <p>NO DEPARTMENT DATA AVAILABLE YET.</p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Question Modal -->
+  <div class="modal-overlay" id="qModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>ADD LOGIC NODE</h3>
+        <button class="modal-close" id="qModalClose">&#x2715;</button>
+      </div>
+      <div class="modal-body">
+        <form id="questionForm">
+          <div class="form-group">
+            <label>Node Title</label>
+            <input type="text" id="qTitle" required placeholder="e.g. Fix the Loop Bug">
+          </div>
+          <div class="form-group">
+            <label>Language</label>
+            <select id="qLanguage">
+              <option value="python">Python</option>
+              <option value="c">C Programming</option>
+              <option value="java">Java</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Buggy Code (Students will see this)</label>
+            <textarea id="qBuggyCode" required placeholder="Paste buggy code here..."></textarea>
+          </div>
+          <div class="form-group">
+            <label>Correct Code (For evaluation)</label>
+            <textarea id="qCorrectCode" required placeholder="Paste correct code here..."></textarea>
+          </div>
+          <div class="form-actions">
+            <button type="submit" class="btn btn-cyan">SAVE NODE</button>
+            <button type="button" class="btn" id="qModalCloseBtn">CANCEL</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Student Modal -->
+  <div class="modal-overlay" id="sModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>REGISTER NEW OPERATOR</h3>
+        <button class="modal-close" id="sModalClose">&#x2715;</button>
+      </div>
+      <div class="modal-body">
+        <form id="studentForm">
+          <div class="form-group">
+            <label>Full Name</label>
+            <input type="text" id="sName" required placeholder="Student Name">
+          </div>
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" id="sEmail" required placeholder="student@email.com">
+          </div>
+          <div class="form-group">
+            <label>Password</label>
+            <input type="password" id="sPassword" required placeholder="Set a password">
+          </div>
+          <div class="form-group">
+            <label>Department</label>
+            <input type="text" id="sDepartment" required placeholder="e.g. CSE">
+          </div>
+          <div class="form-group">
+            <label>College Name</label>
+            <input type="text" id="sCollege" required placeholder="e.g. XYZ College">
+          </div>
+          <div class="form-group">
+            <label>Phone Number</label>
+            <input type="tel" id="sPhone" required placeholder="e.g. 9876543210">
+          </div>
+          <div class="form-actions">
+            <button type="submit" class="btn btn-cyan">AUTHORIZE</button>
+            <button type="button" class="btn" id="sModalCloseBtn">CANCEL</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Proof Modal -->
+  <div class="modal-overlay" id="proofModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>OPERATOR PROOF: SUBMITTED ERRORS</h3>
+        <button class="modal-close" id="proofModalClose">&#x2715;</button>
+      </div>
+      <div class="modal-body" id="proofModalBody">
+        <!-- Mistakes will be injected here -->
+      </div>
+    </div>
+  </div>
+
+  <!-- SheetJS for Excel export -->
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+  <!-- jsPDF for PDF export -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+  
+  <script type="module" src="../js/admin-portal.js"></script>
+</body>
+</html>
