@@ -13,6 +13,8 @@ let questions        = [];
 let currentIdx       = 0;
 let userAnswers      = {};
 let solvedQuestions  = new Set();
+let skippedQuestions = new Set();
+let touchedQuestions = new Set();
 let editor;
 let malpracticeCount = 0;
 let timeRemaining    = 1800;
@@ -35,6 +37,7 @@ const violationEl     = document.getElementById('violation-count');
 const consoleOutput   = document.getElementById('console-output');
 const lockdownOverlay = document.getElementById('lockdown-overlay');
 const operatorName    = document.getElementById('current-username');
+const questionGrid    = document.getElementById('question-grid');
 
 // ================================
 // ⚠ SECURITY LOCKDOWN
@@ -150,10 +153,10 @@ async function triggerViolation(reason) {
   if (submitting) return;
 
   malpracticeCount++;
-  const display = Math.min(malpracticeCount, 2);
+  const display = Math.min(malpracticeCount, 3);
   if (violationEl) {
-    violationEl.textContent = `VIOLATIONS: ${display} / 2`;
-    violationEl.style.color = display >= 2 ? '#ff3e3e' : '#ffcc00';
+    violationEl.textContent = `VIOLATIONS: ${display} / 3`;
+    violationEl.style.color = display >= 3 ? '#ff3e3e' : '#ffcc00';
   }
 
   try {
@@ -167,7 +170,7 @@ async function triggerViolation(reason) {
     }
   } catch {}
 
-  if (malpracticeCount >= 2) {
+  if (malpracticeCount >= 3) {
     // Last ditch effort: if their current code is correct, give them the marks before kickout
     const q = questions[currentIdx];
     if (q && editor) {
@@ -179,14 +182,14 @@ async function triggerViolation(reason) {
 
     showAlert(
       "MALPRACTICE DETECTED",
-      `Reason: ${reason}\n\nYou have reached the maximum violation limit.\nYour test is being submitted automatically.`,
+      `Reason: ${reason}\n\nYou have reached the maximum violation limit (3 strikes).\nYour test is being submitted automatically.`,
       'error',
       () => finalSubmit()
     );
   } else {
     showAlert(
       "⚠ SECURITY WARNING",
-      `Reason: ${reason}\n\nViolation ${malpracticeCount} / 2.\nOne more violation will AUTO-SUBMIT your test.`,
+      `Reason: ${reason}\n\nViolation ${malpracticeCount} / 3.\n${3 - malpracticeCount} more violation(s) will AUTO-SUBMIT your test.`,
       'warning'
     );
   }
@@ -233,7 +236,7 @@ function loadUserInfo() {
       const d = snap.data();
       if (operatorName) operatorName.textContent = (d.name || 'OPERATOR').toUpperCase();
       malpracticeCount = d.malpracticeCount || 0;
-      if (violationEl) violationEl.textContent = `VIOLATIONS: ${Math.min(malpracticeCount, 2)} / 2`;
+      if (violationEl) violationEl.textContent = `VIOLATIONS: ${Math.min(malpracticeCount, 3)} / 3`;
     });
   });
 }
@@ -257,6 +260,7 @@ function loadQuestionsRealtime() {
   }
   questions = loaded;
   currentIdx = 0;
+  touchedQuestions.add(questions[0].id);
   renderQuestion();
   startTimer();
   
@@ -289,9 +293,40 @@ function renderQuestion() {
     monaco.editor.setModelLanguage(editor.getModel(), lang === 'c' ? 'c' : lang === 'java' ? 'java' : 'python');
   }
 
+  touchedQuestions.add(q.id);
   if (consoleOutput) consoleOutput.innerHTML = '<span style="color:#8899aa;">&gt; Ready. Click EXECUTE to run your code.</span>';
 
+  renderNavigationSidebar();
   updateNavButtons();
+}
+
+function renderNavigationSidebar() {
+  if (!questionGrid || questions.length === 0) return;
+  questionGrid.innerHTML = '';
+
+  questions.forEach((q, idx) => {
+    const dot = document.createElement('div');
+    dot.className = 'nav-dot';
+    dot.textContent = idx + 1;
+
+    if (idx === currentIdx) dot.classList.add('active');
+    
+    if (solvedQuestions.has(q.id)) {
+      dot.classList.add('answered');
+    } else if (skippedQuestions.has(q.id)) {
+      dot.classList.add('skipped');
+    } else if (!touchedQuestions.has(q.id)) {
+      dot.classList.add('unattended');
+    }
+
+    dot.onclick = () => {
+      saveCurrentAnswer();
+      currentIdx = idx;
+      renderQuestion();
+    };
+
+    questionGrid.appendChild(dot);
+  });
 }
 
 function updateNavButtons() {
@@ -331,14 +366,15 @@ function initButtonHandlers() {
       const studentCode = userAnswers[q.id] || '';
       
       // Log as skipped (non-blocking)
+      skippedQuestions.add(q.id);
       logMistake(q, studentCode + "\n# (SKIPPED)");
       
       if (currentIdx < questions.length - 1) { 
         currentIdx++; 
-        if(editor) editor.setValue('');
         renderQuestion(); 
       } else {
-        finalSubmit();
+        renderNavigationSidebar(); // Update one last time
+        showAlert('LAST NODE', 'You have reached the last question. You can review your skipped nodes from the navigator.', 'warning');
       }
     };
   }
@@ -356,17 +392,18 @@ function initButtonHandlers() {
       
       if (score === 4) {
         // Correct answer: save instantly and then show success
-        if (!solvedQuestions.has(q.id)) {
+          if (!solvedQuestions.has(q.id)) {
           await saveScore(4);
           solvedQuestions.add(q.id);
+          skippedQuestions.delete(q.id); // Remove from skipped if solved
         }
         showAlert('SUCCESS', 'Error fixed successfully! ✓', 'success', () => {
           if (currentIdx < questions.length - 1) { 
             currentIdx++; 
-            if(editor) editor.setValue('');
             renderQuestion(); 
           } else {
-            finalSubmit();
+            renderNavigationSidebar();
+            showAlert('MISSION COMPLETE', 'All nodes processed. You can review or TERMINATE_MISSION.', 'success');
           }
         });
       } else {
