@@ -1,4 +1,3 @@
-
 function normalizeCode(code, lang = 'python') {
   if (!code) return '';
   let clean = code;
@@ -10,7 +9,7 @@ function normalizeCode(code, lang = 'python') {
     clean = clean.replace(/\/\/.*$/gm, '');
   }
   
-  // Normalized logic including proposed improvements
+
   clean = clean
     .replace(/\+\+([a-zA-Z0-9_]+)/g, '$1+=1')
     .replace(/([a-zA-Z0-9_]+)\+\+/g, '$1+=1')
