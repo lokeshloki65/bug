@@ -62,7 +62,7 @@
         .workspace {
             flex: 1;
             display: grid;
-            grid-template-columns: 350px 1fr;
+            grid-template-columns: 350px 1fr 280px;
             overflow: hidden;
         }
 
@@ -75,6 +75,7 @@
             flex-direction: column;
             gap: var(--spacing-md);
             background: rgba(0, 242, 255, 0.02);
+            position: relative;
         }
 
         .question-num {
@@ -216,6 +217,101 @@
             font-family: 'Share Tech Mono', monospace;
             font-weight: 900;
         }
+
+        /* Navigation Sidebar */
+        .navigation-panel {
+            padding: var(--spacing-lg);
+            border-left: 1px solid var(--primary);
+            background: rgba(0, 242, 255, 0.01);
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            overflow-y: auto;
+        }
+
+        .nav-header {
+            font-size: 0.8rem;
+            color: var(--primary);
+            text-transform: uppercase;
+            border-bottom: 1px solid var(--primary);
+            padding-bottom: 5px;
+            letter-spacing: 2px;
+        }
+
+        .question-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+
+        .nav-dot {
+            aspect-ratio: 1/1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--glass-border);
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .nav-dot:hover {
+            border-color: var(--primary);
+            background: rgba(0, 242, 255, 0.1);
+            color: var(--primary);
+        }
+
+        .nav-dot.active {
+            border-color: var(--primary);
+            box-shadow: 0 0 10px var(--primary);
+            color: var(--primary);
+            background: rgba(0, 242, 255, 0.1);
+        }
+
+        .nav-dot.answered {
+            background: #3ef0a1 !important;
+            border-color: #3ef0a1 !important;
+            color: #000 !important;
+            font-weight: bold;
+        }
+
+        .nav-dot.skipped {
+            background: #ffcc00 !important;
+            border-color: #ffcc00 !important;
+            color: #000 !important;
+            font-weight: bold;
+        }
+
+        .nav-dot.unattended {
+            background: #ff3e3e !important;
+            border-color: #ff3e3e !important;
+            color: #fff !important;
+            font-weight: bold;
+        }
+
+        .legend {
+            margin-top: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            font-size: 0.7rem;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text-muted);
+        }
+
+        .dot-sample {
+            width: 12px;
+            height: 12px;
+            border-radius: 2px;
+        }
     </style>
 </head>
 <body class="scanline-container" oncontextmenu="return false;">
@@ -249,8 +345,8 @@
                 INITIALIZING_DESCRIPTION_NODE...
             </div>
             <div style="margin-top: auto; padding: 1rem; border: 1px solid var(--error); background: rgba(255,0,85,0.05);">
-                <small style="color: var(--error); letter-spacing: 1px;">WARNING: VIOLATIONS_CAP = 2</small>
-                <div style="font-weight: 700; color: var(--error); margin-top: 0.5rem; font-size: 1.2rem;" id="violation-count">V_LOG: 0</div>
+                <small style="color: var(--error); letter-spacing: 1px;">WARNING: VIOLATIONS_CAP = 3</small>
+                <div style="font-weight: 700; color: var(--error); margin-top: 0.5rem; font-size: 1.2rem;" id="violation-count">V_LOG: 0 / 3</div>
             </div>
         </section>
 
@@ -260,8 +356,31 @@
                 <div class="console-header">
                     <span>SYSTEM_OUTPUT</span>
                     <button id="clear-console-btn" style="background:none; color:inherit; font-size:0.6rem; border:1px solid black; cursor:pointer;">CLEAR</button>
+                    <button id="run-code-btn" style="background:black; color:var(--primary); font-size:0.75rem; border:1px solid var(--primary); cursor:pointer; padding: 2px 10px;">EXECUTE</button>
                 </div>
                 <div class="console-output" id="console-output">KERNEL_READY...</div>
+            </div>
+        </section>
+
+        <section class="navigation-panel">
+            <div class="nav-header">NODE_NAVIGATOR</div>
+            <div class="question-grid" id="question-grid">
+                <!-- Dots injected by JS -->
+            </div>
+            
+            <div class="legend">
+                <div class="legend-item">
+                    <div class="dot-sample" style="background: #3ef0a1;"></div>
+                    <span>VERIFIED</span>
+                </div>
+                <div class="legend-item">
+                    <div class="dot-sample" style="background: #ffcc00;"></div>
+                    <span>SKIPPED</span>
+                </div>
+                <div class="legend-item">
+                    <div class="dot-sample" style="background: #ff3e3e;"></div>
+                    <span>NOT_TOUCHED</span>
+                </div>
             </div>
         </section>
     </main>
